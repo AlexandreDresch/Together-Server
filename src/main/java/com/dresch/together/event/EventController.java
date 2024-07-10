@@ -26,7 +26,7 @@ public class EventController {
 
         this.eventRepository.save(newEvent);
 
-        this.participantService.registerParticipantsToEvent(payload.emails_to_invite(), newEvent.getId());
+        this.participantService.registerParticipantsToEvent(payload.emails_to_invite(), newEvent);
 
         return ResponseEntity.ok(new EventCreateResponse(newEvent.getId()));
     }
@@ -50,6 +50,24 @@ public class EventController {
             rawEvent.setDestination(payload.destination());
 
             this.eventRepository.save(rawEvent);
+
+            return ResponseEntity.ok(rawEvent);
+        }
+
+        return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/confirm")
+    public ResponseEntity<Event> confirmEvent(@PathVariable UUID id){
+        Optional<Event> event = this.eventRepository.findById(id);
+
+        if(event.isPresent()) {
+            Event rawEvent = event.get();
+
+            rawEvent.setIsConfirmed(true);
+
+            this.eventRepository.save(rawEvent);
+            this.participantService.triggerConfirmationEmailToParticipants(id);
 
             return ResponseEntity.ok(rawEvent);
         }
