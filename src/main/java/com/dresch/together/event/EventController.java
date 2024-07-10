@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +34,25 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventDetails(@PathVariable UUID id){
         Optional<Event> event = this.eventRepository.findById(id);
+
+        return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Event> updateEvent(@PathVariable UUID id, @RequestBody EventRequestPayload payload){
+        Optional<Event> event = this.eventRepository.findById(id);
+
+        if(event.isPresent()) {
+            Event rawEvent = event.get();
+
+            rawEvent.setEndsAt(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
+            rawEvent.setStartsAt(LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
+            rawEvent.setDestination(payload.destination());
+
+            this.eventRepository.save(rawEvent);
+
+            return ResponseEntity.ok(rawEvent);
+        }
 
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
