@@ -13,6 +13,14 @@ public class ParticipantService {
     @Autowired
     private ParticipantRepository participantRepository;
 
+    public ParticipantCreateResponse registerParticipantToEvent(String email, Event event){
+        Participant newParticipant = new Participant(email, event);
+
+        this.participantRepository.save(newParticipant);
+
+        return new ParticipantCreateResponse(newParticipant.getId());
+    }
+
     public void registerParticipantsToEvent(List<String> participantsToInvite, Event event) {
        List<Participant> participants = participantsToInvite.stream().map(email -> new Participant(email, event)).toList();
 
@@ -20,4 +28,6 @@ public class ParticipantService {
     }
 
     public void triggerConfirmationEmailToParticipants(UUID eventId){}
+
+    public void triggerConfirmationEmailToParticipant(String email){}
 }

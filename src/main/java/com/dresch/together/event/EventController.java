@@ -1,5 +1,7 @@
 package com.dresch.together.event;
 
+import com.dresch.together.participant.ParticipantCreateResponse;
+import com.dresch.together.participant.ParticipantRequestPayload;
 import com.dresch.together.participant.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -73,5 +77,22 @@ public class EventController {
         }
 
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload){
+        Optional<Event> event = this.eventRepository.findById(id);
+
+        if(event.isPresent()) {
+            Event rawEvent = event.get();
+
+            ParticipantCreateResponse participantCreateResponse = this.participantService.registerParticipantToEvent(payload.email(), rawEvent);
+
+            if (rawEvent.getIsConfirmed()) this.participantService.triggerConfirmationEmailToParticipant(payload.email());
+
+            return ResponseEntity.ok(participantCreateResponse);
+        }
+
+        return ResponseEntity.notFound().build();
     }
 }
