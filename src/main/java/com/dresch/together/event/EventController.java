@@ -4,6 +4,10 @@ import com.dresch.together.activity.ActivityData;
 import com.dresch.together.activity.ActivityRequestPayload;
 import com.dresch.together.activity.ActivityResponse;
 import com.dresch.together.activity.ActivityService;
+import com.dresch.together.link.LinkData;
+import com.dresch.together.link.LinkRequestPayload;
+import com.dresch.together.link.LinkResponse;
+import com.dresch.together.link.LinkService;
 import com.dresch.together.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +28,9 @@ public class EventController {
 
     @Autowired
     private ParticipantService participantService;
+
+    @Autowired
+    private LinkService linkService;
 
     @Autowired
     private EventRepository eventRepository;
@@ -127,5 +134,27 @@ public class EventController {
         List<ActivityData> activityDataList = this.activityService.getAllActivitiesFromId(id);
 
         return ResponseEntity.ok(activityDataList);
+    }
+
+    @PostMapping("/{id}/links")
+    public ResponseEntity<LinkResponse> registerLink(@PathVariable UUID id, @RequestBody LinkRequestPayload payload){
+        Optional<Event> event = this.eventRepository.findById(id);
+
+        if(event.isPresent()) {
+            Event rawEvent = event.get();
+
+            LinkResponse linkResponse = this.linkService.registerLink(payload, rawEvent);
+
+            return ResponseEntity.ok(linkResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<LinkData>> getAllLinks(@PathVariable UUID id){
+        List<LinkData> linksDataList = this.linkService.getAllLinksFromId(id);
+
+        return ResponseEntity.ok(linksDataList);
     }
 }
