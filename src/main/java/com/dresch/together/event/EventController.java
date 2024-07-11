@@ -1,5 +1,9 @@
 package com.dresch.together.event;
 
+import com.dresch.together.activities.ActivityData;
+import com.dresch.together.activities.ActivityRequestPayload;
+import com.dresch.together.activities.ActivityResponse;
+import com.dresch.together.activities.ActivityService;
 import com.dresch.together.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +18,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/events")
 public class EventController {
+
+    @Autowired
+    private ActivityService activityService;
 
     @Autowired
     private ParticipantService participantService;
@@ -99,5 +105,27 @@ public class EventController {
         List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
 
         return ResponseEntity.ok(participantList);
+    }
+
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponse> registerActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload){
+        Optional<Event> event = this.eventRepository.findById(id);
+
+        if(event.isPresent()) {
+            Event rawEvent = event.get();
+
+            ActivityResponse activityResponse = this.activityService.registerActivity(payload, rawEvent);
+
+            return ResponseEntity.ok(activityResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id){
+        List<ActivityData> activityDataList = this.activityService.getAllActivitiesFromId(id);
+
+        return ResponseEntity.ok(activityDataList);
     }
 }
