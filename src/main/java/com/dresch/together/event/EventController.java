@@ -1,8 +1,6 @@
 package com.dresch.together.event;
 
-import com.dresch.together.participant.ParticipantCreateResponse;
-import com.dresch.together.participant.ParticipantRequestPayload;
-import com.dresch.together.participant.ParticipantService;
+import com.dresch.together.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -94,5 +92,12 @@ public class EventController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/participants")
+    public ResponseEntity<List<ParticipantData>> getAllParticipants(@PathVariable UUID id){
+        List<ParticipantData> participantList = this.participantService.getAllParticipantsFromEvent(id);
+
+        return ResponseEntity.ok(participantList);
     }
 }
