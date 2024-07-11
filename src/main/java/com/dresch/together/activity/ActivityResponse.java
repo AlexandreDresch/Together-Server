@@ -1,4 +1,4 @@
-package com.dresch.together.activities;
+package com.dresch.together.activity;
 
 import java.util.UUID;
 

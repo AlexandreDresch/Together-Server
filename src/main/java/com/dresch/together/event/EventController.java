@@ -1,9 +1,9 @@
 package com.dresch.together.event;
 
-import com.dresch.together.activities.ActivityData;
-import com.dresch.together.activities.ActivityRequestPayload;
-import com.dresch.together.activities.ActivityResponse;
-import com.dresch.together.activities.ActivityService;
+import com.dresch.together.activity.ActivityData;
+import com.dresch.together.activity.ActivityRequestPayload;
+import com.dresch.together.activity.ActivityResponse;
+import com.dresch.together.activity.ActivityService;
 import com.dresch.together.participant.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

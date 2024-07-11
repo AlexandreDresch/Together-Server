@@ -1,4 +1,4 @@
-package com.dresch.together.activities;
+package com.dresch.together.activity;
 
 import com.dresch.together.event.Event;
 import jakarta.persistence.*;
